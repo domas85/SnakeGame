@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "Definitions.h"
 #include "GameFramework/Pawn.h"
 #include "Components/SphereComponent.h"
 #include "SnakePawn.generated.h"
@@ -16,15 +17,45 @@ public:
 	// Sets default values for this pawn's properties
 	ASnakePawn();
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "SnakeComponents")
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "SnakeComponents")
 	USceneComponent* SceneComponent;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "SnakeComponents")
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "SnakeComponents")
 	USphereComponent* CollisionComponent;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "SnakeComponents")
+	ESnakeDirection Direction = ESnakeDirection::None;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "SnakeComponents")
+	float MovedTileDistance = 0.0f;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "SnakeComponents")
+	FRotator ForwardRotation;
 
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	float VelocityY = 0.0f;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	float Speed = 100.0f;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	TArray<ESnakeDirection> DirectionsQueue;
+
+	UFUNCTION()
+	void UpdateDirection();
+
+	UFUNCTION()
+	void UpdateFalling(float DeltaTime);
+
+	UFUNCTION()
+	void UpdateMoving(float DeltaTime);
+
+	UFUNCTION()
+	void MoveSnake(float Distance);
 
 public:	
 	// Called every frame
@@ -32,5 +63,8 @@ public:
 
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
+
+	UFUNCTION(BlueprintCallable)
+	void SetSnakeMoveDirrection(ESnakeDirection InDirection);
 
 };
