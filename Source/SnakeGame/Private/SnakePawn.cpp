@@ -2,6 +2,7 @@
 
 
 #include "SnakePawn.h"
+#include "SnakeBodyPart.h"
 
 // Sets default values
 ASnakePawn::ASnakePawn()
@@ -18,10 +19,35 @@ ASnakePawn::ASnakePawn()
 	CollisionComponent->SetupAttachment(RootComponent);
 }
 
+void ASnakePawn::PossessedBy(AController* InController)
+{
+	if (InController)
+	{
+		SetActorRotation(InController->GetControlRotation());
+	}
+}
+
 // Called when the game starts or when spawned
 void ASnakePawn::BeginPlay()
 {
 	Super::BeginPlay();
+
+}
+
+// Called every frame
+void ASnakePawn::Tick(float DeltaTime)
+{
+	Super::Tick(DeltaTime);
+
+	UpdateFalling(DeltaTime);
+
+	UpdateMoving(DeltaTime);
+}
+
+// Called to bind functionality to input
+void ASnakePawn::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
+{
+	Super::SetupPlayerInputComponent(PlayerInputComponent);
 
 }
 
@@ -93,33 +119,34 @@ void ASnakePawn::UpdateMoving(float DeltaTime)
 		UpdateDirection();
 
 		TotalMoveDistance -= MoveDistance;
-		
+
 		MoveDistance = TotalMoveDistance;
 
 		MovedTileDistance -= TileSize;
+
+		if (IsValid(ChildBodyPart))
+		{
+			ChildBodyPart->SetNextPosition(GetActorLocation());
+		}
+
+		if (Direction != ESnakeDirection::None)
+		{
+			TmpMovementMade++;
+			if (TmpMovementMade > 5)
+			{
+				TmpMovementMade = 0;
+
+				AteApple();
+			}
+		}
+
+
 	}
 
 	if (MoveDistance > 0.0f)
 	{
 		MoveSnake(MoveDistance);
 	}
-}
-
-// Called every frame
-void ASnakePawn::Tick(float DeltaTime)
-{
-	Super::Tick(DeltaTime);
-
-	UpdateFalling(DeltaTime);
-
-	UpdateMoving(DeltaTime);
-}
-
-// Called to bind functionality to input
-void ASnakePawn::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
-{
-	Super::SetupPlayerInputComponent(PlayerInputComponent);
-
 }
 
 void ASnakePawn::UpdateDirection()
@@ -159,6 +186,25 @@ void ASnakePawn::SetSnakeMoveDirrection(ESnakeDirection InDirection)
 	DirectionsQueue.Add(InDirection);
 
 	//Direction = InDirection;
-
 }
 
+void ASnakePawn::AteApple()
+{
+	UE_LOG(LogTemp, Log, TEXT("Ate Apple!"));
+
+	FActorSpawnParameters SpawnParams;
+	SpawnParams.Owner = this;
+	SpawnParams.Instigator = GetInstigator();
+
+	ASnakeBodyPart* BodyPart = GetWorld()->SpawnActor<ASnakeBodyPart>(BodyPartClass, GetActorLocation(), GetActorRotation(), SpawnParams);
+
+	if (IsValid(ChildBodyPart))
+	{
+		ChildBodyPart->AddChildBodyPart(BodyPart);
+	}
+	else
+	{
+		ChildBodyPart = BodyPart;
+	}
+
+}

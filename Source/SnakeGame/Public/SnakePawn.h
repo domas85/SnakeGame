@@ -8,6 +8,8 @@
 #include "Components/SphereComponent.h"
 #include "SnakePawn.generated.h"
 
+class ASnakeBodyPart;
+
 UCLASS()
 class SNAKEGAME_API ASnakePawn : public APawn
 {
@@ -26,11 +28,8 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "SnakeComponents")
 	ESnakeDirection Direction = ESnakeDirection::None;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "SnakeComponents")
-	float MovedTileDistance = 0.0f;
-
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "SnakeComponents")
-	FRotator ForwardRotation;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "SnakeComponents")
+	TSubclassOf<ASnakeBodyPart> BodyPartClass;
 
 protected:
 	// Called when the game starts or when spawned
@@ -40,10 +39,22 @@ protected:
 	float VelocityY = 0.0f;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
-	float Speed = 100.0f;
+	float Speed = 500.0f;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "SnakeComponents")
+	float MovedTileDistance = 0.0f;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "SnakeComponents")
+	FRotator ForwardRotation;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	TArray<ESnakeDirection> DirectionsQueue;
+
+	UPROPERTY()
+	ASnakeBodyPart* ChildBodyPart = nullptr;
+
+	UPROPERTY()
+	int TmpMovementMade = 0;
 
 	UFUNCTION()
 	void UpdateDirection();
@@ -56,6 +67,12 @@ protected:
 
 	UFUNCTION()
 	void MoveSnake(float Distance);
+
+	UFUNCTION()
+	void AteApple();
+
+	UFUNCTION()
+	void PossessedBy(AController* InController);
 
 public:	
 	// Called every frame
