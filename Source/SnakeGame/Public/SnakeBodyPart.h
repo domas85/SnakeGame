@@ -33,6 +33,9 @@ protected:
 	virtual void BeginPlay() override;
 
 	UPROPERTY()
+	float SpawnWithNoCollisionTime = 0;
+
+	UPROPERTY()
 	FVector NextPosition = FVector::ZeroVector;
 
 	UPROPERTY()
@@ -44,5 +47,8 @@ public:
 
 	UFUNCTION()
 	void SetNextPosition(const FVector& InPosition);
+
+	UFUNCTION(BlueprintCallable)
+	void KYS();
 
 };

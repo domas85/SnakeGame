@@ -30,6 +30,13 @@ void ASnakeBodyPart::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+	SpawnWithNoCollisionTime += DeltaTime;
+
+	if (SpawnWithNoCollisionTime >= 0.15f)
+	{
+		CollisionComponent->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
+	}
+
 	if (NextPosition != FVector::ZeroVector)
 	{
 		FVector Position = GetActorLocation();
@@ -65,5 +72,14 @@ void ASnakeBodyPart::AddChildBodyPart(ASnakeBodyPart* InBodyPart)
 
 		Child->SetActorLocation(GetActorLocation());
 	}
+}
+
+void ASnakeBodyPart::KYS()
+{
+	if (IsValid(Child))
+	{
+		Child->KYS();
+	}
+	Destroy();
 }
 

@@ -50,7 +50,7 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	TArray<ESnakeDirection> DirectionsQueue;
 
-	UPROPERTY()
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	ASnakeBodyPart* ChildBodyPart = nullptr;
 
 	UPROPERTY()

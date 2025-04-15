@@ -197,6 +197,16 @@ void ASnakePawn::AteApple()
 	SpawnParams.Instigator = GetInstigator();
 
 	ASnakeBodyPart* BodyPart = GetWorld()->SpawnActor<ASnakeBodyPart>(BodyPartClass, GetActorLocation(), GetActorRotation(), SpawnParams);
+	
+	//ChildBodyPart->SetActorEnableCollision(false);
+	
+
+	//BodyPart->CollisionComponent->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
+	//BodyPart->CollisionComponent->SetCollisionResponseToAllChannels(ECollisionResponse::ECR_Overlap);
+	//BodyPart->SetActorEnableCollision(false);
+
+
+
 
 	if (IsValid(ChildBodyPart))
 	{

@@ -23,7 +23,10 @@ public:
 	UInstancedStaticMeshComponent* InstancedFloors;
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
-	UInstancedStaticMeshComponent* InstancedWalls2;
+	TSubclassOf<AActor> InstancedWalls;
+
+	UPROPERTY()
+	TArray<AActor*> SpawnActors;
 
 	virtual void OnConstruction(const FTransform& Transform) override;
 
@@ -34,5 +37,8 @@ protected:
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
+
+	UFUNCTION(BlueprintCallable)
+	void CleanUpMap();
 
 };

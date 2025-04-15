@@ -18,19 +18,30 @@ ASnakeWorld::ASnakeWorld()
 
 	InstancedFloors->SetupAttachment(RootComponent);
 
-	InstancedWalls2 = CreateDefaultSubobject<UInstancedStaticMeshComponent>(TEXT("InstancedWalls2"));
+	//InstancedWalls2 = CreateDefaultSubobject<UInstancedStaticMeshComponent>(TEXT("InstancedWalls2"));
 
-	InstancedWalls2->SetupAttachment(RootComponent);
+	//InstancedWalls2->SetupAttachment(RootComponent);
 }
 
 void ASnakeWorld::OnConstruction(const FTransform& Transform)
 {
 	UE_LOG(LogTemp, Log, TEXT("OnConstruction called"));
-	
-	
-	InstancedWalls2->ClearInstances();
-	InstancedFloors->ClearInstances();
 
+	// Clean up previous instances
+	// 
+	//InstancedWalls2->ClearInstances();
+	InstancedFloors->ClearInstances();
+	for (auto& Actor : SpawnActors)
+	{
+		if (IsValid(Actor))
+		{
+			Actor->Destroy();
+		}
+	}
+	SpawnActors.Empty();
+
+
+	// Load the level data from a file
 	TArray<FString> Lines;
 	FString FilePath = FPaths::ProjectDir() + TEXT("Levels/Level1.txt");
 
@@ -46,7 +57,18 @@ void ASnakeWorld::OnConstruction(const FTransform& Transform)
 
 				if (Line[x] == '#')
 				{
-					InstancedWalls2->AddInstance(Offset);
+					if (IsValid(InstancedWalls))
+					{
+						AActor* spawnedActor = GetWorld()->SpawnActor<AActor>(InstancedWalls, Offset, FActorSpawnParameters());
+						if (IsValid(spawnedActor))
+						{
+							spawnedActor->AttachToActor(this, FAttachmentTransformRules::KeepRelativeTransform);
+							SpawnActors.Add(spawnedActor);
+						}
+					}
+
+
+					//InstancedWalls2->AddInstance(Offset);
 				}
 				else
 				{
