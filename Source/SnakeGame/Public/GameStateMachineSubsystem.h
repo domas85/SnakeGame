@@ -3,8 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "Subsystems/GameInstanceSubsystem.h"
-#include "GameStateSubsystem.generated.h"
+#include "GameStateMachineSubsystem.generated.h"
 
 UENUM(BlueprintType)
 enum class EGameState : uint8
@@ -22,7 +21,7 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnGameStateChanged, EGameState, Ol
  * 
  */
 UCLASS()
-class SNAKEGAME_API UGameStateSubsystem : public UGameInstanceSubsystem
+class SNAKEGAME_API UGameStateMachineSubsystem : public UGameInstanceSubsystem
 {
 	GENERATED_BODY()
 	
