@@ -3,6 +3,7 @@
 
 #include "SnakePawn.h"
 #include "SnakeBodyPart.h"
+#include "SnakePlayerState.h"
 
 // Sets default values
 ASnakePawn::ASnakePawn()
@@ -24,6 +25,13 @@ void ASnakePawn::PossessedBy(AController* InController)
 	if (InController)
 	{
 		SetActorRotation(InController->GetControlRotation());
+	}
+
+	SnakePlayerState = Cast<ASnakePlayerState>(GetPlayerState());
+
+	if (!IsValid(SnakePlayerState))
+	{
+		return;
 	}
 }
 
@@ -106,6 +114,8 @@ void ASnakePawn::MoveSnake(float Distance)
 
 void ASnakePawn::UpdateMoving(float DeltaTime)
 {
+	float Speed = SnakePlayerState->GetSnakeSpeed();
+
 	float TotalMoveDistance = Speed * DeltaTime;
 
 	float MoveDistance = TotalMoveDistance;

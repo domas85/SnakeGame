@@ -9,6 +9,7 @@
 #include "SnakePawn.generated.h"
 
 class ASnakeBodyPart;
+class ASnakePlayerState;
 
 UCLASS()
 class SNAKEGAME_API ASnakePawn : public APawn
@@ -35,11 +36,11 @@ protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
+	UPROPERTY()
+	ASnakePlayerState* SnakePlayerState = nullptr;
+
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	float VelocityY = 0.0f;
-
-	UPROPERTY(EditAnywhere, BlueprintReadOnly)
-	float Speed = 500.0f;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "SnakeComponents")
 	float MovedTileDistance = 0.0f;
@@ -71,15 +72,14 @@ protected:
 	UFUNCTION()
 	void AteApple();
 
-	UFUNCTION()
-	void PossessedBy(AController* InController);
-
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
+
+	virtual void PossessedBy(AController* InController) override;
 
 	UFUNCTION(BlueprintCallable)
 	void SetSnakeMoveDirrection(ESnakeDirection InDirection);
