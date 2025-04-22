@@ -2,6 +2,7 @@
 
 
 #include "SnakeBodyPart.h"
+#include "SnakePlayerState.h"
 
 // Sets default values
 ASnakeBodyPart::ASnakeBodyPart()
@@ -30,6 +31,16 @@ void ASnakeBodyPart::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+	ASnakePlayerState* snakePlayerState = GetInstigatorController()->GetPlayerState<ASnakePlayerState>();
+
+	if(!IsValid(snakePlayerState))
+	{
+		UE_LOG(LogTemp, Error, TEXT("ASnakeBodyPart::Tick - >   snakePlayerState is not valid"));
+		return;
+	}
+
+	float Speed = snakePlayerState->GetSnakeSpeed();
+
 	SpawnWithNoCollisionTime += DeltaTime;
 
 	if (SpawnWithNoCollisionTime >= 0.15f)
@@ -44,7 +55,7 @@ void ASnakeBodyPart::Tick(float DeltaTime)
 		// FVector Forward = (NextPosition -= Position).GetSafeNormal(); Boids like behavior
 		FVector Forward = (NextPosition - Position).GetSafeNormal();
 
-		Position += Forward * DeltaTime * 500.0f;
+		Position += Forward * DeltaTime * Speed;
 
 		SetActorLocation(Position);
 	}

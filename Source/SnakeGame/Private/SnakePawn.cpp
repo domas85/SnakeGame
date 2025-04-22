@@ -3,6 +3,7 @@
 
 #include "SnakePawn.h"
 #include "SnakeBodyPart.h"
+#include "GameFramework/PlayerState.h"
 #include "SnakePlayerState.h"
 
 // Sets default values
@@ -27,7 +28,7 @@ void ASnakePawn::PossessedBy(AController* InController)
 		SetActorRotation(InController->GetControlRotation());
 	}
 
-	SnakePlayerState = Cast<ASnakePlayerState>(GetPlayerState());
+	SnakePlayerState = InController->GetPlayerState<ASnakePlayerState>();
 
 	if (!IsValid(SnakePlayerState))
 	{
@@ -46,6 +47,11 @@ void ASnakePawn::BeginPlay()
 void ASnakePawn::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+
+	if (!IsValid(SnakePlayerState))
+	{
+		return;
+	}
 
 	UpdateFalling(DeltaTime);
 

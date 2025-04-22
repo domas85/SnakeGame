@@ -16,13 +16,13 @@ void ASnakePlayerController::InitInput()
 	{
 		if (!IsValid(Subsystem))
 		{
-			UE_LOG(LogTemp, Error, TEXT("Subsystem is not valid"));
+			UE_LOG(LogTemp, Error, TEXT("ASnakePlayerController::InitInput - >   Subsystem is not valid"));
 			return;
 		}
 
 		if (!IsValid(DefaultMappingContext))
 		{
-			UE_LOG(LogTemp, Error, TEXT("DefaultMappingContext is not valid"));
+			UE_LOG(LogTemp, Error, TEXT("ASnakePlayerController::InitInput - >   DefaultMappingContext is not valid"));
 
 		}
 
