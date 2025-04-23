@@ -6,6 +6,8 @@
 #include "GameFramework/GameMode.h"
 #include "SnakeGameMode.generated.h"
 
+class ASnakePlayerState;
+
 /**
  * 
  */
@@ -13,5 +15,8 @@ UCLASS()
 class SNAKEGAME_API ASnakeGameMode : public AGameMode
 {
 	GENERATED_BODY()
+
+public:
+	void AppleEaten(ASnakePlayerState* PlayerState);
 	
 };

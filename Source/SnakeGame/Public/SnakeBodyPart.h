@@ -7,6 +7,8 @@
 #include "Components/SphereComponent.h"
 #include "SnakeBodyPart.generated.h"
 
+class ASnakePlayerState;
+
 UCLASS()
 class SNAKEGAME_API ASnakeBodyPart : public AActor
 {
@@ -31,6 +33,8 @@ public:
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
+
+	ASnakePlayerState* snakePlayerState = nullptr;
 
 	UPROPERTY()
 	float SpawnWithNoCollisionTime = 0;

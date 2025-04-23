@@ -6,6 +6,7 @@
 #include "GameFramework/PlayerState.h"
 #include "SnakePlayerState.h"
 
+
 // Sets default values
 ASnakePawn::ASnakePawn()
 {
@@ -220,5 +221,7 @@ void ASnakePawn::AteApple()
 	{
 		ChildBodyPart = BodyPart;
 	}
+
+	SnakePlayerState->AddApple();
 
 }

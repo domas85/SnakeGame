@@ -17,6 +17,8 @@ ASnakeBodyPart::ASnakeBodyPart()
 	CollisionComponent = CreateDefaultSubobject<USphereComponent>(TEXT("CollisionComponent"));
 
 	CollisionComponent->SetupAttachment(RootComponent);
+
+
 }
 
 // Called when the game starts or when spawned
@@ -24,6 +26,13 @@ void ASnakeBodyPart::BeginPlay()
 {
 	Super::BeginPlay();
 
+	snakePlayerState = GetInstigatorController()->GetPlayerState<ASnakePlayerState>();
+
+	if (!IsValid(snakePlayerState))
+	{
+		UE_LOG(LogTemp, Error, TEXT("ASnakeBodyPart::Tick - >   snakePlayerState is not valid"));
+		return;
+	}
 }
 
 // Called every frame
@@ -31,13 +40,6 @@ void ASnakeBodyPart::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-	ASnakePlayerState* snakePlayerState = GetInstigatorController()->GetPlayerState<ASnakePlayerState>();
-
-	if(!IsValid(snakePlayerState))
-	{
-		UE_LOG(LogTemp, Error, TEXT("ASnakeBodyPart::Tick - >   snakePlayerState is not valid"));
-		return;
-	}
 
 	float Speed = snakePlayerState->GetSnakeSpeed();
 

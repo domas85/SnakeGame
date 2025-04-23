@@ -33,10 +33,10 @@ public:
 	UPROPERTY(BlueprintAssignable, Category = "GameState")
 	FOnGameStateChanged OnGameStateChanged;
 
-	UFUNCTION(BlueprintCallable)
+	UFUNCTION(BlueprintCallable, BlueprintPure)
 	inline EGameState GetGameState() const { return GameState; }
 
-	UFUNCTION()
+	UFUNCTION(BlueprintCallable)
 	void ChangeState(EGameState InNewState);
 
 };

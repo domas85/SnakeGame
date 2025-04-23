@@ -18,8 +18,19 @@ class SNAKEGAME_API ASnakePlayerState : public APlayerState
 protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Snake")
 	float SnakeSpeed = 500.0f;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Snake")
+	int ApplesEaten = 0;
+
 	
 public:
 	UFUNCTION(BlueprintCallable, BlueprintPure)
 	float GetSnakeSpeed() const { return SnakeSpeed; }
+
+	UFUNCTION(BlueprintCallable)
+	float IncreaseSnakeSpeed(float InAddSpeed);
+
+	UFUNCTION(BlueprintCallable)
+	void AddApple();
+
 };
