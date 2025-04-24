@@ -12,7 +12,8 @@ enum class EGameState : uint8
 	Menu,
 	Play,
 	Pause,
-	GameOver
+	GameOver,
+	Quit,
 };
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_TwoParams(FOnGameStateChanged, EGameState, OldGameState, EGameState, NewGameState);
