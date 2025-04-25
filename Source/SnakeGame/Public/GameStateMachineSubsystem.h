@@ -35,7 +35,7 @@ public:
 	FOnGameStateChanged OnGameStateChanged;
 
 	UFUNCTION(BlueprintCallable, BlueprintPure)
-	inline EGameState GetGameState() const { return GameState; }
+	FORCEINLINE EGameState GetGameState() const { return GameState; }
 
 	UFUNCTION(BlueprintCallable)
 	void ChangeState(EGameState InNewState);
