@@ -27,7 +27,7 @@ private:
 
 public:
 	UFUNCTION(BlueprintCallable, BlueprintPure)
-	FORCEINLINE ESnakeGameType GetGameType() { return GameType; }
+	FORCEINLINE ESnakeGameType GetGameType() const { return GameType; }
 
 	UFUNCTION(BlueprintCallable)
 	void SetGameType(ESnakeGameType InGameType);
