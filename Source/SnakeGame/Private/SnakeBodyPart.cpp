@@ -45,7 +45,7 @@ void ASnakeBodyPart::Tick(float DeltaTime)
 
 	SpawnWithNoCollisionTime += DeltaTime;
 
-	if (SpawnWithNoCollisionTime >= 0.15f)
+	if (SpawnWithNoCollisionTime >= 0.3f)
 	{
 		CollisionComponent->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
 	}

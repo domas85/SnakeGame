@@ -23,5 +23,8 @@ void ASnakePlayerState::AddApple()
 		return;
 	}
 
+
 	SnakeGameMode->AppleEaten(this);
+
+	appleEaten.Broadcast(ApplesEaten);
 }

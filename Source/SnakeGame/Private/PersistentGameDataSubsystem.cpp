@@ -27,6 +27,7 @@ void UPersistentGameDataSubsystem::SaveGameData()
 		return;
 	}
 
+	// Save game date that needs to persist between levels
 	StoredGameData.GameType = GameState->GetGameType();
 }
 
@@ -48,6 +49,7 @@ void UPersistentGameDataSubsystem::LoadGameData()
 		return;
 	}
 
+	// Load game data between levels transitions
 	GameState->SetGameType(StoredGameData.GameType);
 }
 

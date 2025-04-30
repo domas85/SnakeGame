@@ -69,7 +69,7 @@ protected:
 	UFUNCTION()
 	void MoveSnake(float Distance);
 
-	UFUNCTION()
+	UFUNCTION(BlueprintCallable)
 	void AteApple();
 
 public:	

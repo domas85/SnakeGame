@@ -6,6 +6,8 @@
 #include "GameFramework/PlayerState.h"
 #include "SnakePlayerState.generated.h"
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnAppleEaten, int, newAppleCount);
+
 /**
  * 
  */
@@ -24,6 +26,9 @@ protected:
 
 	
 public:
+	UPROPERTY(BlueprintAssignable, Category = "SnakeState")
+	FOnAppleEaten appleEaten;
+
 	UFUNCTION(BlueprintCallable, BlueprintPure)
 	float GetSnakeSpeed() const { return SnakeSpeed; }
 

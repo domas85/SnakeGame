@@ -145,7 +145,7 @@ void ASnakePawn::UpdateMoving(float DeltaTime)
 		{
 			ChildBodyPart->SetNextPosition(GetActorLocation());
 		}
-
+		/*
 		if (Direction != ESnakeDirection::None)
 		{
 			TmpMovementMade++;
@@ -156,6 +156,7 @@ void ASnakePawn::UpdateMoving(float DeltaTime)
 				AteApple();
 			}
 		}
+		*/
 	}
 
 	if (MoveDistance > 0.0f)
@@ -212,6 +213,8 @@ void ASnakePawn::AteApple()
 	SpawnParams.Instigator = GetInstigator();
 
 	ASnakeBodyPart* BodyPart = GetWorld()->SpawnActor<ASnakeBodyPart>(BodyPartClass, GetActorLocation(), GetActorRotation(), SpawnParams);
+
+	//BodyPart->AttachToActor(this, FAttachmentTransformRules::KeepWorldTransform);
 
 	if (IsValid(ChildBodyPart))
 	{
