@@ -226,5 +226,4 @@ void ASnakePawn::AteApple()
 	}
 
 	SnakePlayerState->AddApple();
-
 }

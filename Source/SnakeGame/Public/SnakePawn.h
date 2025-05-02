@@ -8,6 +8,7 @@
 #include "Components/SphereComponent.h"
 #include "SnakePawn.generated.h"
 
+
 class ASnakeBodyPart;
 class ASnakePlayerState;
 

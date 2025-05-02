@@ -37,6 +37,7 @@ public:
 //};
 
 
+
 UCLASS()
 class SNAKEGAME_API ASnakeWorld : public AActor
 {
@@ -55,6 +56,9 @@ public:
 	UPROPERTY(BlueprintReadWrite, EditAnywhere)
 	TSubclassOf<AActor> InstancedWalls;
 
+	UPROPERTY(BlueprintReadWrite, EditAnywhere)
+	TSubclassOf<AActor> Apple;
+
 	UPROPERTY()
 	TArray<AActor*> SpawnActors;
 
@@ -65,14 +69,20 @@ protected:
 	virtual void BeginPlay() override;
 
 	//UPROPERTY()
-	//TArray<FRune2DArray> MyArray;
+	//TArray<FTile2DArray> MyArray;
 
-	TArray<TArray<FTile*>> GridLevel;
-
+	TArray<TArray<FTile*>> GridLevel;	
 
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
+
+	FVector GetGridLocationByIndex(int x, int y);
+
+	UFUNCTION(BlueprintCallable)
+	void SpawnApple();
+
+	void FindTileBasedOnLocation(FVector Location, int& x, int& y);
 
 	//UFUNCTION(BlueprintCallable)
 	//void CleanUpMap();

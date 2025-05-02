@@ -1,4 +1,12 @@
 {
   "Bookmarks": [],
-  "Recents": []
+  "Recents": [
+    "C:\\files\\Unreal_Projects\\SnakeGame\\Source\\SnakeGame\\Private\\SnakeWorld.cpp",
+    "C:\\files\\Unreal_Projects\\SnakeGame\\Source\\SnakeGame\\Private\\SnakeBodyPart.cpp",
+    "C:\\files\\Unreal_Projects\\SnakeGame\\Source\\SnakeGame\\Private\\SnakePawn.cpp",
+    "C:\\files\\Unreal_Projects\\SnakeGame\\Source\\SnakeGame\\Public\\SnakePawn.h",
+    "C:\\files\\Unreal_Projects\\SnakeGame\\Source\\SnakeGame\\Private\\SnakePlayerState.cpp",
+    "C:\\files\\Unreal_Projects\\SnakeGame\\Source\\SnakeGame\\Public\\SnakePlayerState.h",
+    "C:\\files\\Unreal_Projects\\SnakeGame\\Source\\SnakeGame\\Public\\SnakeWorld.h"
+  ]
 }
