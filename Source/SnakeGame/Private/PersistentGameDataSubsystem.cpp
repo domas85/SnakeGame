@@ -3,7 +3,6 @@
 
 #include "PersistentGameDataSubsystem.h"
 
-
 void UPersistentGameDataSubsystem::SetNumPlayers(int InNumPlayers)
 {
 	NumPlayers = InNumPlayers;

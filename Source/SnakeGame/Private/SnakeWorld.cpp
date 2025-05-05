@@ -51,7 +51,7 @@ void ASnakeWorld::OnConstruction(const FTransform& Transform)
 		{
 			for (int x = 0; x < Line.Len(); x++)
 			{
-				FTransform Offset = FTransform(FRotator::ZeroRotator, FVector((Lines.Num() - y) * 100.0f, x * 100.0f, 0.0f));
+				FTransform Offset = FTransform(FRotator::ZeroRotator, FVector(((Lines.Num() - y) * 100.0f) - 100.0f, x * 100.0f, 0.0f));
 
 
 				if (Line[x] == '#')
@@ -99,38 +99,52 @@ void ASnakeWorld::BeginPlay()
 		int y = 0;
 		for (const FString& Line : Lines)
 		{
-			GridLevel[y].SetNum(Line.Len());
-			GridLevel[y].Reserve(Line.Len());
+			GridLevel[(Lines.Num() - y) - 1].SetNum(Line.Len());
+			GridLevel[(Lines.Num() - y) - 1].Reserve(Line.Len());
 
 			for (int x = 0; x < Line.Len(); x++)
 			{
-				FTransform Offset = FTransform(FRotator::ZeroRotator, FVector((Lines.Num() - y) * 100.0f, x * 100.0f, 0.0f));
+				FTransform Offset = FTransform(FRotator::ZeroRotator, FVector(((Lines.Num() - y) * 100.0f) - 100.0f, x * 100.0f, 0.0f));
 
 				if (Line[x] == '#')
 				{
 					FTile* Tile = new FTile();
 					Tile->Location = Offset.GetLocation();
 					Tile->isOccupied = true;
-					GridLevel[y][x] = Tile;
+					GridLevel[(Lines.Num() - y) - 1][x] = Tile;
 				}
 				else
 				{
 					FTile* Tile = new FTile();
 					Tile->Location = Offset.GetLocation();
 					Tile->isOccupied = false;
-					GridLevel[y][x] = Tile;
+					GridLevel[(Lines.Num() - y) - 1][x] = Tile;
 				}
 			}
 			y++;
 		}
 	}
+	//Algo::Reverse(GridLevel);
 
 	SpawnApple();
 	int x = 0;
 	int y = 0;
-	FindTileBasedOnLocation(FVector(1300.0f, 100.0f, 0.0f), x, y);
+	FindTileBasedOnLocation(FVector(900.0f, 2200.0f, 0.0f), x, y);
 
-	UE_LOG(LogTemp, Log, TEXT("Grid Level: %d %d"), x, y);
+	UE_LOG(LogTemp, Log, TEXT("Find Grid Level: %d %d"), x, y);
+
+	if (x <= GridLevel.Num() && x >= 0 && y <= GridLevel[0].Num() - 1 && y >= 0)
+	{
+		UE_LOG(LogTemp, Log, TEXT("Grid Level from that index: %f %f"), GridLevel[x][y]->Location.X, GridLevel[x][y]->Location.Y);
+		if (GridLevel[x][y]->isOccupied == true)
+		{
+			UE_LOG(LogTemp, Log, TEXT("Is that tile Occupied: %s"), TEXT("true"));
+		}
+		else
+		{
+			UE_LOG(LogTemp, Log, TEXT("Is that tile Occupied: %s"), TEXT("false"));
+		}
+	}
 }
 
 void ASnakeWorld::SpawnApple()
@@ -158,8 +172,8 @@ void ASnakeWorld::SpawnApple()
 void ASnakeWorld::FindTileBasedOnLocation(FVector Location, int& x, int& y)
 {
 	FVector LocalLocation = Location - GetActorLocation();
-	x = FMath::FloorToInt(LocalLocation.Y / 100.0f);
-	y = FMath::FloorToInt(LocalLocation.X / 100.0f);
+	y = FMath::FloorToInt(LocalLocation.Y / 100.0f);
+	x = FMath::FloorToInt(LocalLocation.X / 100.0f);
 }
 
 // Called every frame
