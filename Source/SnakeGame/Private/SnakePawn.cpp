@@ -76,7 +76,7 @@ void ASnakePawn::UpdateFalling(float DeltaTime)
 
 	Position.Z += VelocityY;
 
-	if (Position.Z <= 0.0f)
+	if (Position.Z <= 5.0f)
 	{
 		Position.Z = -Position.Z;
 
@@ -86,7 +86,7 @@ void ASnakePawn::UpdateFalling(float DeltaTime)
 		{
 			VelocityY = 0.0f;
 
-			Position.Z = 0.0f;
+			Position.Z = 5.0f;
 		}
 	}
 

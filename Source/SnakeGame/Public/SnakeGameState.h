@@ -25,6 +25,9 @@ private:
 	UPROPERTY()
 	ESnakeGameType GameType = ESnakeGameType::Cooperative;
 
+	UPROPERTY()
+	int32 currentLevel = 0;
+
 public:
 	UFUNCTION(BlueprintCallable, BlueprintPure)
 	FORCEINLINE ESnakeGameType GetGameType() const { return GameType; }
@@ -32,5 +35,9 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void SetGameType(ESnakeGameType InGameType);
 
+	UFUNCTION(BlueprintCallable, BlueprintPure)
+	FORCEINLINE int32 GetCurrentLevel() const { return currentLevel; }
 
+	UFUNCTION(BlueprintCallable)
+	void SetNextLevel();
 };

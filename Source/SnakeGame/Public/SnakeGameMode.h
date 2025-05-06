@@ -18,5 +18,6 @@ class SNAKEGAME_API ASnakeGameMode : public AGameMode
 
 public:
 	void AppleEaten(ASnakePlayerState* PlayerState);
-	
+
+	void CheckAppleCount();
 };

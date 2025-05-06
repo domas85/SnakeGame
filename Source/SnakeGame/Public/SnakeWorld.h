@@ -7,6 +7,8 @@
 #include "GameFramework/Actor.h"
 #include "SnakeWorld.generated.h"
 
+class ASnakeGameState;
+
 USTRUCT()
 struct FTile
 {
@@ -18,25 +20,6 @@ public:
 	bool isOccupied = false;
 
 };
-
-
-//USTRUCT()
-//struct FTile2DArray {
-//	GENERATED_BODY()
-//public:
-//
-//	TArray<FTile> Ar;
-//
-//	FTile operator[] (int32 i) {
-//		return Ar[i];
-//	}
-//
-//	void Add(FTile rune) {
-//		Ar.Add(rune);
-//	}
-//};
-
-
 
 UCLASS()
 class SNAKEGAME_API ASnakeWorld : public AActor
@@ -68,10 +51,18 @@ protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
-	//UPROPERTY()
-	//TArray<FTile2DArray> MyArray;
+	UPROPERTY()
+	ASnakeGameState* GameState;
 
 	TArray<TArray<FTile*>> GridLevel;	
+
+	TArray<FString> Levels;
+
+	UPROPERTY()
+	int32 LoadedLevel = 0;
+
+	UFUNCTION()
+	void CleanUpMap();
 
 public:	
 	// Called every frame
@@ -84,7 +75,6 @@ public:
 
 	void FindTileBasedOnLocation(FVector Location, int& x, int& y);
 
-	//UFUNCTION(BlueprintCallable)
-	//void CleanUpMap();
-
+	UFUNCTION(BlueprintCallable)
+	void UpdateMap();
 };

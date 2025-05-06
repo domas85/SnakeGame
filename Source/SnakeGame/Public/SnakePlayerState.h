@@ -29,6 +29,9 @@ public:
 	UPROPERTY(BlueprintAssignable, Category = "SnakeState")
 	FOnAppleEaten appleEaten;
 
+	UFUNCTION()
+	FORCEINLINE int GetApplesEaten() const { return ApplesEaten; };
+
 	UFUNCTION(BlueprintCallable, BlueprintPure)
 	float GetSnakeSpeed() const { return SnakeSpeed; }
 

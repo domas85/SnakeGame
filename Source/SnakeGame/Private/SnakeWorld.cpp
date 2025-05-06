@@ -2,6 +2,7 @@
 
 
 #include "SnakeWorld.h"
+#include "SnakeGameState.h"
 
 // Sets default values
 ASnakeWorld::ASnakeWorld()
@@ -21,28 +22,20 @@ ASnakeWorld::ASnakeWorld()
 	//InstancedWalls2 = CreateDefaultSubobject<UInstancedStaticMeshComponent>(TEXT("InstancedWalls2"));
 
 	//InstancedWalls2->SetupAttachment(RootComponent);
+
+	Levels.Add(TEXT("Levels/Level1.txt"));
+	Levels.Add(TEXT("Levels/Level2.txt"));
 }
 
 void ASnakeWorld::OnConstruction(const FTransform& Transform)
 {
 	UE_LOG(LogTemp, Log, TEXT("OnConstruction called"));
 
-	// Clean up previous instances
-	// 
-	//InstancedWalls2->ClearInstances();
-	InstancedFloors->ClearInstances();
-	for (auto& Actor : SpawnActors)
-	{
-		if (IsValid(Actor))
-		{
-			Actor->Destroy();
-		}
-	}
-	SpawnActors.Empty();
+	CleanUpMap();
 
 	// Load the level data from a file
 	TArray<FString> Lines;
-	FString FilePath = FPaths::ProjectDir() + TEXT("Levels/Level1.txt");
+	FString FilePath = FPaths::ProjectDir() + Levels[0];
 
 	if (FFileHelper::LoadFileToStringArray(Lines, *FilePath))
 	{
@@ -52,7 +45,6 @@ void ASnakeWorld::OnConstruction(const FTransform& Transform)
 			for (int x = 0; x < Line.Len(); x++)
 			{
 				FTransform Offset = FTransform(FRotator::ZeroRotator, FVector(((Lines.Num() - y) * 100.0f) - 100.0f, x * 100.0f, 0.0f));
-
 
 				if (Line[x] == '#')
 				{
@@ -69,7 +61,6 @@ void ASnakeWorld::OnConstruction(const FTransform& Transform)
 				else
 				{
 					InstancedFloors->AddInstance(Offset);
-
 				}
 			}
 			y++;
@@ -77,6 +68,20 @@ void ASnakeWorld::OnConstruction(const FTransform& Transform)
 	}
 }
 
+void ASnakeWorld::CleanUpMap()
+{
+	InstancedFloors->ClearInstances();
+
+	for (auto& Actor : SpawnActors)
+	{
+		if (IsValid(Actor))
+		{
+			Actor->Destroy();
+			UE_LOG(LogTemp, Log, TEXT("Destroying Actor"));
+		}
+	}
+	SpawnActors.Empty();
+}
 
 FVector ASnakeWorld::GetGridLocationByIndex(int x, int y)
 {
@@ -89,7 +94,9 @@ void ASnakeWorld::BeginPlay()
 	Super::BeginPlay();
 
 	TArray<FString> Lines;
-	FString FilePath = FPaths::ProjectDir() + TEXT("Levels/Level1.txt");
+	FString FilePath = FPaths::ProjectDir() + Levels[0];
+
+	LoadedLevel = 0;
 
 	if (FFileHelper::LoadFileToStringArray(Lines, *FilePath))
 	{
@@ -126,29 +133,107 @@ void ASnakeWorld::BeginPlay()
 	}
 	//Algo::Reverse(GridLevel);
 
-	SpawnApple();
-	int x = 0;
-	int y = 0;
-	FindTileBasedOnLocation(FVector(900.0f, 2200.0f, 0.0f), x, y);
+	//int x = 0;
+	//int y = 0;
+	//FindTileBasedOnLocation(FVector(900.0f, 2200.0f, 0.0f), x, y);
 
-	UE_LOG(LogTemp, Log, TEXT("Find Grid Level: %d %d"), x, y);
+	//UE_LOG(LogTemp, Log, TEXT("Find Grid Level: %d %d"), x, y);
 
-	if (x <= GridLevel.Num() && x >= 0 && y <= GridLevel[0].Num() - 1 && y >= 0)
+	//if (x <= GridLevel.Num() && x >= 0 && y <= GridLevel[0].Num() - 1 && y >= 0)
+	//{
+	//	UE_LOG(LogTemp, Log, TEXT("Grid Level from that index: %f %f"), GridLevel[x][y]->Location.X, GridLevel[x][y]->Location.Y);
+	//	if (GridLevel[x][y]->isOccupied == true)
+	//	{
+	//		UE_LOG(LogTemp, Log, TEXT("Is that tile Occupied: %s"), TEXT("true"));
+	//	}
+	//	else
+	//	{
+	//		UE_LOG(LogTemp, Log, TEXT("Is that tile Occupied: %s"), TEXT("false"));
+	//	}
+	//}
+
+	UWorld* World = GetWorld();
+
+	if (!IsValid(World))
 	{
-		UE_LOG(LogTemp, Log, TEXT("Grid Level from that index: %f %f"), GridLevel[x][y]->Location.X, GridLevel[x][y]->Location.Y);
-		if (GridLevel[x][y]->isOccupied == true)
+		UE_LOG(LogTemp, Warning, TEXT("UPersistentGameDataSubsystem::SaveGameData: Invalid world"));
+	}
+
+	GameState = Cast<ASnakeGameState>(World->GetGameState());
+
+	if (!IsValid(GameState))
+	{
+		UE_LOG(LogTemp, Warning, TEXT("UPersistentGameDataSubsystem::SaveGameData: Invalid game state"));
+	}
+
+	SpawnApple();
+}
+
+void ASnakeWorld::UpdateMap()
+{
+
+	if (!IsValid(GameState))
+	{
+		UE_LOG(LogTemp, Warning, TEXT("UPersistentGameDataSubsystem::SaveGameData: Invalid game state"));
+		return;
+	}
+	if (LoadedLevel == GameState->GetCurrentLevel())
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Stopping map update.. Level is the same"));
+		return;
+	}
+
+	CleanUpMap();
+
+	// Load the level data from a file
+	TArray<FString> Lines;
+	FString FilePath = FPaths::ProjectDir() + Levels[GameState->GetCurrentLevel()];
+	LoadedLevel = GameState->GetCurrentLevel();
+
+	if (FFileHelper::LoadFileToStringArray(Lines, *FilePath))
+	{
+		int y = 0;
+		for (const FString& Line : Lines)
 		{
-			UE_LOG(LogTemp, Log, TEXT("Is that tile Occupied: %s"), TEXT("true"));
-		}
-		else
-		{
-			UE_LOG(LogTemp, Log, TEXT("Is that tile Occupied: %s"), TEXT("false"));
+			for (int x = 0; x < Line.Len(); x++)
+			{
+				FTransform Offset = FTransform(FRotator::ZeroRotator, FVector(((Lines.Num() - y) * 100.0f) - 100.0f, x * 100.0f, 0.0f));
+
+				if (Line[x] == '#')
+				{
+					if (IsValid(InstancedWalls))
+					{
+						AActor* spawnedActor = GetWorld()->SpawnActor<AActor>(InstancedWalls, Offset, FActorSpawnParameters());
+						if (IsValid(spawnedActor))
+						{
+							spawnedActor->AttachToActor(this, FAttachmentTransformRules::KeepRelativeTransform);
+							SpawnActors.Add(spawnedActor);
+						}
+					}
+					FTile* Tile = new FTile();
+					Tile->Location = Offset.GetLocation();
+					Tile->isOccupied = true;
+					GridLevel[(Lines.Num() - y) - 1][x] = Tile;
+				}
+				else
+				{
+					InstancedFloors->AddInstance(Offset);
+					
+					FTile* Tile = new FTile();
+					Tile->Location = Offset.GetLocation();
+					Tile->isOccupied = false;
+					GridLevel[(Lines.Num() - y) - 1][x] = Tile;
+				}
+			}
+			y++;
 		}
 	}
 }
 
 void ASnakeWorld::SpawnApple()
 {
+	UpdateMap();
+
 	while (true)
 	{
 		int xMaxIndex = GridLevel[0].Num();
@@ -158,7 +243,7 @@ void ASnakeWorld::SpawnApple()
 		int y = FMath::RandRange(0, yMaxIndex - 1);
 		if (GridLevel[y][x]->isOccupied == false)
 		{
-			FTransform Offset = FTransform(FRotator::ZeroRotator, FVector((yMaxIndex - y) * 100.0f, x * 100.0f, 50.0f));
+			FTransform Offset = FTransform(FRotator::ZeroRotator, FVector(((yMaxIndex - y) * 100.0f) - 100.0f, x * 100.0f, 50.0f));
 			AActor* spawnedActor = GetWorld()->SpawnActor<AActor>(Apple, Offset, FActorSpawnParameters());
 			if (IsValid(spawnedActor))
 			{
