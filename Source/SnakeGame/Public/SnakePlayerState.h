@@ -18,6 +18,8 @@ class SNAKEGAME_API ASnakePlayerState : public APlayerState
 	
 
 protected:
+	virtual void BeginPlay() override;
+
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Snake")
 	float SnakeSpeed = 500.0f;
 
@@ -28,6 +30,9 @@ protected:
 public:
 	UPROPERTY(BlueprintAssignable, Category = "SnakeState")
 	FOnAppleEaten appleEaten;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	FString PlayerName;
 
 	UFUNCTION()
 	FORCEINLINE int GetApplesEaten() const { return ApplesEaten; };

@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "SnakeGameState.h"
+#include "SnakePlayerState.h"
 #include "Subsystems/GameInstanceSubsystem.h"
 #include "PersistentGameDataSubsystem.generated.h"
 
@@ -15,6 +16,11 @@ struct FStoredGameData
 	UPROPERTY()
 	ESnakeGameType GameType;
 
+	UPROPERTY()
+	TArray<FString> PlayerNames;
+
+	UPROPERTY()
+	TArray<int> ApplesEatenForEachPlayer;
 };
 
 /**
@@ -44,4 +50,10 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 	void LoadGameData();
+
+	UFUNCTION(BlueprintCallable, BlueprintPure)
+	FORCEINLINE TArray<FString> GetPlayersNames() const { return StoredGameData.PlayerNames; };
+
+	UFUNCTION(BlueprintCallable, BlueprintPure)
+	FORCEINLINE TArray<int> GetPlayersAppleCount() const { return StoredGameData.ApplesEatenForEachPlayer; };
 };
