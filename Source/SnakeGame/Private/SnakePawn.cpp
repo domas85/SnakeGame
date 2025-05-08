@@ -145,18 +145,6 @@ void ASnakePawn::UpdateMoving(float DeltaTime)
 		{
 			ChildBodyPart->SetNextPosition(GetActorLocation());
 		}
-		/*
-		if (Direction != ESnakeDirection::None)
-		{
-			TmpMovementMade++;
-			if (TmpMovementMade > 5)
-			{
-				TmpMovementMade = 0;
-
-				AteApple();
-			}
-		}
-		*/
 	}
 
 	if (MoveDistance > 0.0f)
@@ -202,6 +190,12 @@ void ASnakePawn::SetSnakeMoveDirrection(ESnakeDirection InDirection)
 	DirectionsQueue.Add(InDirection);
 
 	//Direction = InDirection;
+}
+
+void ASnakePawn::ClearMoveQueue()
+{
+	MovedTileDistance = 0.0f;
+	DirectionsQueue.Empty();
 }
 
 void ASnakePawn::AteApple()

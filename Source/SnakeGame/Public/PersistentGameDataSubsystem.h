@@ -8,6 +8,26 @@
 #include "Subsystems/GameInstanceSubsystem.h"
 #include "PersistentGameDataSubsystem.generated.h"
 
+UENUM(BlueprintType)
+enum class EPlayerType : uint8
+{
+	None,
+	Human,
+	AI
+};
+
+USTRUCT(BlueprintType)
+struct FPlayerData
+{
+	GENERATED_BODY()
+
+	UPROPERTY()
+	FString PlayerName;
+
+	UPROPERTY()
+	EPlayerType PlayerType;
+};
+
 USTRUCT()
 struct FStoredGameData
 {
@@ -21,6 +41,7 @@ struct FStoredGameData
 
 	UPROPERTY()
 	TArray<int> ApplesEatenForEachPlayer;
+
 };
 
 /**
@@ -37,6 +58,8 @@ private:
 
 	UPROPERTY()
 	FStoredGameData StoredGameData;
+
+	TArray<FPlayerData> PlayersData;
 	
 public:
 	UFUNCTION(BlueprintCallable, BlueprintPure)
@@ -56,4 +79,13 @@ public:
 
 	UFUNCTION(BlueprintCallable, BlueprintPure)
 	FORCEINLINE TArray<int> GetPlayersAppleCount() const { return StoredGameData.ApplesEatenForEachPlayer; };
+
+	UFUNCTION(BlueprintCallable)
+	void AddPlayers();
+
+	UFUNCTION(BlueprintCallable)
+	void ChangePlayerType(int PlayerIndex, EPlayerType InPlayerType);
+
+	UFUNCTION(BlueprintCallable, BlueprintPure)
+	FORCEINLINE TArray<FPlayerData> GetPlayersData() const { return PlayersData; };
 };

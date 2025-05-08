@@ -70,5 +70,29 @@ void UPersistentGameDataSubsystem::LoadGameData()
 	GameState->SetGameType(StoredGameData.GameType);
 }
 
+void UPersistentGameDataSubsystem::AddPlayers()
+{
+	PlayersData.Empty();
+	PlayersData.Reserve(NumPlayers);
+
+	for (int i = 0; i < NumPlayers; i++)
+	{
+		FPlayerData playerData;
+		playerData.PlayerName = FString::Printf(TEXT("Player %d"), i);
+		playerData.PlayerType = EPlayerType::Human;
+		PlayersData.Add(playerData);
+	}
+}
+
+void UPersistentGameDataSubsystem::ChangePlayerType(int PlayerIndex, EPlayerType InPlayerType)
+{
+	if (PlayerIndex < 0 || PlayerIndex >= PlayersData.Num())
+	{
+		UE_LOG(LogTemp, Warning, TEXT("UPersistentGameDataSubsystem::ChangePlayerType: Invalid player index"));
+		return;
+	}
+	PlayersData[PlayerIndex].PlayerType = InPlayerType;
+	
+}
 
 

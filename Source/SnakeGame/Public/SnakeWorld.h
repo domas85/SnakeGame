@@ -21,6 +21,8 @@ public:
 
 };
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnSnakeMapChange);
+
 UCLASS()
 class SNAKEGAME_API ASnakeWorld : public AActor
 {
@@ -44,6 +46,9 @@ public:
 
 	UPROPERTY()
 	TArray<AActor*> SpawnActors;
+
+	UPROPERTY()
+	TArray<AActor*> Apples;
 
 	virtual void OnConstruction(const FTransform& Transform) override;
 
@@ -71,10 +76,13 @@ public:
 	FVector GetGridLocationByIndex(int x, int y);
 
 	UFUNCTION(BlueprintCallable)
-	void SpawnApple();
+	void SpawnApple(AActor* OldApple);
 
 	void FindTileBasedOnLocation(FVector Location, int& x, int& y);
 
 	UFUNCTION(BlueprintCallable)
 	void UpdateMap();
+
+	UPROPERTY(BlueprintAssignable)
+	FOnSnakeMapChange MapChanged;
 };

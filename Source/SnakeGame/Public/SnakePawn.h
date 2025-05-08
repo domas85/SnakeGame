@@ -85,4 +85,7 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void SetSnakeMoveDirrection(ESnakeDirection InDirection);
 
+	UFUNCTION(BlueprintCallable)
+	void ClearMoveQueue();
+
 };

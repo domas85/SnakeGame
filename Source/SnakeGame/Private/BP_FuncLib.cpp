@@ -31,8 +31,8 @@ void UBP_FuncLib::RemoveSplitscreenPlayers()
 
 	if (!currentWorld)
 	{
-		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("GEngine->GetWorld() return NULL"));
 		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("Possibly Because there is no LocalPlayer"));
+		GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("GEngine->GetWorld() return NULL"));
 		return;
 	}
 

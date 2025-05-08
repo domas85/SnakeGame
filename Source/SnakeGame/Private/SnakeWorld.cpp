@@ -165,8 +165,6 @@ void ASnakeWorld::BeginPlay()
 	{
 		UE_LOG(LogTemp, Warning, TEXT("UPersistentGameDataSubsystem::SaveGameData: Invalid game state"));
 	}
-
-	SpawnApple();
 }
 
 void ASnakeWorld::UpdateMap()
@@ -184,6 +182,8 @@ void ASnakeWorld::UpdateMap()
 	}
 
 	CleanUpMap();
+
+	MapChanged.Broadcast();
 
 	// Load the level data from a file
 	TArray<FString> Lines;
@@ -210,29 +210,37 @@ void ASnakeWorld::UpdateMap()
 							SpawnActors.Add(spawnedActor);
 						}
 					}
-					FTile* Tile = new FTile();
-					Tile->Location = Offset.GetLocation();
-					Tile->isOccupied = true;
-					GridLevel[(Lines.Num() - y) - 1][x] = Tile;
+
+					GridLevel[(Lines.Num() - y) - 1][x]->isOccupied = true;
 				}
 				else
 				{
 					InstancedFloors->AddInstance(Offset);
-					
-					FTile* Tile = new FTile();
-					Tile->Location = Offset.GetLocation();
-					Tile->isOccupied = false;
-					GridLevel[(Lines.Num() - y) - 1][x] = Tile;
+
+					GridLevel[(Lines.Num() - y) - 1][x]->isOccupied = false;
 				}
 			}
 			y++;
 		}
 	}
+
+	int applesInLevel = Apples.Num() - 1;
+
+	for (int a = 0; a <= applesInLevel; a++)
+	{
+		SpawnApple(Apples[a]);
+	}
 }
 
-void ASnakeWorld::SpawnApple()
+void ASnakeWorld::SpawnApple(AActor* OldApple)
 {
 	UpdateMap();
+
+	if (IsValid(OldApple))
+	{
+		Apples.Remove(OldApple);
+		OldApple->Destroy();
+	}
 
 	while (true)
 	{
@@ -243,11 +251,12 @@ void ASnakeWorld::SpawnApple()
 		int y = FMath::RandRange(0, yMaxIndex - 1);
 		if (GridLevel[y][x]->isOccupied == false)
 		{
-			FTransform Offset = FTransform(FRotator::ZeroRotator, FVector(((yMaxIndex - y) * 100.0f) - 100.0f, x * 100.0f, 50.0f));
+			FTransform Offset = FTransform(FRotator::ZeroRotator, GridLevel[y][x]->Location + FVector(0.0f, 0.0f, 50.0f));
 			AActor* spawnedActor = GetWorld()->SpawnActor<AActor>(Apple, Offset, FActorSpawnParameters());
 			if (IsValid(spawnedActor))
 			{
 				spawnedActor->AttachToActor(this, FAttachmentTransformRules::KeepRelativeTransform);
+				Apples.Add(spawnedActor);
 			}
 			break;
 		}
