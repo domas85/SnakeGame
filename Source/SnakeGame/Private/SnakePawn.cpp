@@ -5,7 +5,9 @@
 #include "SnakeBodyPart.h"
 #include "GameFramework/PlayerState.h"
 #include "SnakePlayerState.h"
-
+#include "SnakeWorld.h"
+#include "Kismet/GameplayStatics.h"
+#include "Containers/BinaryHeap.h"
 
 // Sets default values
 ASnakePawn::ASnakePawn()
@@ -41,6 +43,14 @@ void ASnakePawn::PossessedBy(AController* InController)
 void ASnakePawn::BeginPlay()
 {
 	Super::BeginPlay();
+
+	SnakeWorld = Cast<ASnakeWorld>(UGameplayStatics::GetActorOfClass(GetWorld(), ASnakeWorld::StaticClass()));
+
+	if (!IsValid(SnakeWorld))
+	{
+		UE_LOG(LogTemp, Warning, TEXT("SnakeWorld is not valid"));
+		return;
+	}
 
 }
 
@@ -221,3 +231,136 @@ void ASnakePawn::AteApple()
 
 	SnakePlayerState->AddApple();
 }
+
+ESnakeDirection ASnakePawn::AStarDirection(ASnakeWorld* InGrid)
+{
+	if (!IsValid(InGrid))
+	{
+		return ESnakeDirection::Up;
+	}
+	FVector PlayerLocation = GetActorLocation();
+
+	UNode startNode = *InGrid->FindTileBasedOnLocation(PlayerLocation);
+	UNode targetNode = *InGrid->FindClosestAppleNode(PlayerLocation);
+
+	if (currentSnakeNode != nullptr && currentSnakeNode->gridX == startNode.gridX && currentSnakeNode->gridY == startNode.gridY)
+	{
+		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("Already on the same node"));
+		return Direction;
+	}
+
+	if (currentSnakeNode == nullptr || currentSnakeNode->gridX != startNode.gridX && currentSnakeNode->gridY != startNode.gridY)
+	{
+		currentSnakeNode = &startNode;
+	}
+
+	TArray<UNode*> openSet = TArray<UNode*>();
+	TSet<UNode*> closedSet = TSet<UNode*>();
+	openSet.Add(&startNode);
+
+	while (openSet.Num() > 0)
+	{
+		UNode* currentNode = openSet[0];
+		for (int i = 1; i < openSet.Num(); i++)
+		{
+			if (openSet[i]->fCostCalc() < currentNode->fCostCalc() || openSet[i]->fCostCalc() == currentNode->fCostCalc() && openSet[i]->hCost < currentNode->hCost)
+			{
+				currentNode = openSet[i];
+			}
+		}
+		openSet.Remove(currentNode);
+		closedSet.Add(currentNode);
+		if (*currentNode == targetNode)
+		{
+			TArray<UNode*> path = RetracePath(startNode, *currentNode);
+
+			if (path.Num() > 1)
+			{
+				openSet.Empty();
+				closedSet.Empty();
+				DirectionsQueue.Empty();
+				return GetNextMoveDirection(*path[path.Num() - 2], *path[path.Num() - 1]);
+				//return path[path.Num() - 2]->GetDirection();
+			}
+			else
+			{
+				GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("Path less then 1"));
+				return ESnakeDirection::Up;
+			}
+		}
+
+		//TArray<UNode> neighbours = ;
+		for (UNode* neighbour : InGrid->GetNeighbours(*currentNode))
+		{
+			if (neighbour->isOccupied || closedSet.Contains(neighbour))
+			{
+				continue;
+			}
+			float newCostToNeighbour = currentNode->gCost + GetDistance(*currentNode, *neighbour);
+			if (newCostToNeighbour < neighbour->gCost || !openSet.Contains(neighbour))
+			{
+				neighbour->gCost = newCostToNeighbour;
+				neighbour->hCost = GetDistance(*neighbour, targetNode);
+				//neighbour->fCost = neighbour->gCost + neighbour->hCost;
+				neighbour->ParentNode = currentNode;
+				if (!openSet.Contains(neighbour))
+				{
+					openSet.Add(neighbour);
+				}
+			}
+		}
+	}
+	return ESnakeDirection::Up;
+}
+
+TArray<UNode*> ASnakePawn::RetracePath(UNode& startNode, UNode& endNode)
+{
+	TArray<UNode*> path = TArray<UNode*>();
+	UNode current = endNode;
+	while (current != startNode)
+	{
+		path.Add(&current);
+		current = *current.ParentNode;
+	}
+	return path;
+}
+
+ESnakeDirection ASnakePawn::GetNextMoveDirection(UNode CurrentNode, UNode NextNode)
+{
+	if (CurrentNode.gridX < NextNode.gridX)
+	{
+		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("Right"));
+		return ESnakeDirection::Right;
+	}
+	else if (CurrentNode.gridX > NextNode.gridX)
+	{
+		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("Left"));
+		return ESnakeDirection::Left;
+	}
+	else if (CurrentNode.gridY < NextNode.gridY)
+	{
+		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("Down"));
+		return ESnakeDirection::Down;
+	}
+	else
+	{
+		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("Up"));
+		return ESnakeDirection::Up;
+	}
+}
+
+int ASnakePawn::GetDistance(UNode nodeA, UNode nodeB)
+{
+	int dstX = FMath::Abs(nodeA.gridX - nodeB.gridX);
+	int dstY = FMath::Abs(nodeA.gridY - nodeB.gridY);
+
+	if (dstX > dstY)
+	{
+		return 14 * dstY + 10 * (dstX - dstY);
+	}
+	else
+	{
+		return 14 * dstX + 10 * (dstY - dstX);
+	}
+}
+

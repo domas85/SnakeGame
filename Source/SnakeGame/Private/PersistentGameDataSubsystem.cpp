@@ -78,7 +78,7 @@ void UPersistentGameDataSubsystem::AddPlayers()
 	for (int i = 0; i < NumPlayers; i++)
 	{
 		FPlayerData playerData;
-		playerData.PlayerName = FString::Printf(TEXT("Player %d"), i);
+		playerData.PlayerName = FString::Printf(TEXT("Player %d"), i + 1);
 		playerData.PlayerType = EPlayerType::Human;
 		PlayersData.Add(playerData);
 	}

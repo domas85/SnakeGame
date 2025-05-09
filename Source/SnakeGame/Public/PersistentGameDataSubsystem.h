@@ -21,11 +21,11 @@ struct FPlayerData
 {
 	GENERATED_BODY()
 
-	UPROPERTY()
-	FString PlayerName;
+	UPROPERTY(BlueprintReadWrite)
+	FString PlayerName = "-NotSet-";
 
-	UPROPERTY()
-	EPlayerType PlayerType;
+	UPROPERTY(BlueprintReadWrite)
+	EPlayerType PlayerType = EPlayerType::Human;
 };
 
 USTRUCT()

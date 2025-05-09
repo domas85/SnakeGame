@@ -8,6 +8,7 @@
 #include "SnakeWorld.generated.h"
 
 class ASnakeGameState;
+class UNode;
 
 USTRUCT()
 struct FTile
@@ -19,6 +20,42 @@ public:
 
 	bool isOccupied = false;
 
+	int gridX;
+
+	int gridY;
+
+	int gCost;
+
+	int hCost;
+
+	int fCost;
+
+};
+
+class  UNode
+{
+public:
+	bool isOccupied = false;
+	FVector Location;
+	int gridX;
+	int gridY;
+	int gCost = 0;
+	int hCost = 0;
+	int fCost = 0;
+
+	UNode* ParentNode = nullptr;
+
+	UNode(bool isItOccupied, FVector loc, int x, int y)
+		: isOccupied(isItOccupied), Location(loc), gridX(x), gridY(y)
+	{
+	}
+
+	int fCostCalc() const { return gCost + hCost; };
+	
+	bool operator==(const UNode& other) const
+	{
+		return gridX == other.gridX && gridY == other.gridY;
+	}
 };
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnSnakeMapChange);
@@ -27,8 +64,8 @@ UCLASS()
 class SNAKEGAME_API ASnakeWorld : public AActor
 {
 	GENERATED_BODY()
-	
-public:	
+
+public:
 	// Sets default values for this actor's properties
 	ASnakeWorld();
 
@@ -59,17 +96,21 @@ protected:
 	UPROPERTY()
 	ASnakeGameState* GameState;
 
-	TArray<TArray<FTile*>> GridLevel;	
+	TArray<TArray<UNode*>> GridLevel;
 
 	TArray<FString> Levels;
 
 	UPROPERTY()
 	int32 LoadedLevel = 0;
 
+	int gridSizeX = 0;
+
+	int gridSizeY = 0;
+
 	UFUNCTION()
 	void CleanUpMap();
 
-public:	
+public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
@@ -78,11 +119,17 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void SpawnApple(AActor* OldApple);
 
-	void FindTileBasedOnLocation(FVector Location, int& x, int& y);
+	UNode* FindTileBasedOnLocation(FVector Location);
+
+	UNode* FindClosestAppleNode(FVector PlayerLocation);
 
 	UFUNCTION(BlueprintCallable)
 	void UpdateMap();
 
 	UPROPERTY(BlueprintAssignable)
 	FOnSnakeMapChange MapChanged;
+
+	TArray<UNode*> GetNeighbours(UNode node);
+
+	int MaxGridSize() { return gridSizeX * gridSizeY; };
 };

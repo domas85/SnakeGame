@@ -11,6 +11,8 @@
 
 class ASnakeBodyPart;
 class ASnakePlayerState;
+class ASnakeWorld;
+class UNode;
 
 UCLASS()
 class SNAKEGAME_API ASnakePawn : public APawn
@@ -73,6 +75,9 @@ protected:
 	UFUNCTION(BlueprintCallable)
 	void AteApple();
 
+	UPROPERTY()
+	ASnakeWorld* SnakeWorld = nullptr;
+
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
@@ -88,4 +93,15 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void ClearMoveQueue();
 
+
+	UFUNCTION(BlueprintCallable)
+	ESnakeDirection AStarDirection(ASnakeWorld* InGrid);
+
+	int GetDistance(UNode nodeA, UNode nodeB);
+
+	ESnakeDirection GetNextMoveDirection(UNode CurrentNode, UNode NextNode);
+
+	TArray<UNode*> RetracePath(UNode& startNode, UNode& endNode);
+
+	UNode* currentSnakeNode = nullptr;
 };
