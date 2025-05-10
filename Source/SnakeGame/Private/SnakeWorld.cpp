@@ -271,11 +271,22 @@ TArray<UNode*> ASnakeWorld::GetNeighbours(UNode node)
 {
 	TArray<UNode*> neighbours = TArray<UNode*>();
 
-
-	neighbours.Add(GridLevel[node.gridX+1][node.gridY]);
-	neighbours.Add(GridLevel[node.gridX-1][node.gridY]);
-	neighbours.Add(GridLevel[node.gridX][node.gridY+1]);
-	neighbours.Add(GridLevel[node.gridX][node.gridY-1]);
+	if (node.gridX + 1 < gridSizeX)
+	{
+		neighbours.Add(GridLevel[node.gridX + 1][node.gridY]);
+	}
+	if (node.gridX - 1 >= 0)
+	{
+		neighbours.Add(GridLevel[node.gridX - 1][node.gridY]);
+	}
+	if (node.gridY + 1 < gridSizeY)
+	{
+		neighbours.Add(GridLevel[node.gridX][node.gridY + 1]);
+	}
+	if (node.gridY - 1 >= 0)
+	{
+		neighbours.Add(GridLevel[node.gridX][node.gridY - 1]);
+	}
 
 	//for (int x = -1; x <= 1; x++)
 	//{
@@ -298,8 +309,8 @@ TArray<UNode*> ASnakeWorld::GetNeighbours(UNode node)
 UNode* ASnakeWorld::FindTileBasedOnLocation(FVector Location)
 {
 	FVector LocalLocation = Location - GetActorLocation();
-	int y = FMath::FloorToInt(LocalLocation.Y / 100.0f);
-	int x = FMath::FloorToInt(LocalLocation.X / 100.0f);
+	int y = FMath::RoundToInt(LocalLocation.Y / 100.0f);
+	int x = FMath::RoundToInt(LocalLocation.X / 100.0f);
 
 	return GridLevel[x][y];
 }
@@ -310,6 +321,10 @@ UNode* ASnakeWorld::FindClosestAppleNode(FVector PlayerLocation)
 	UNode* closestApple = nullptr;
 	for (int i = 0; i < Apples.Num(); i++)
 	{
+		if (!IsValid(Apples[i]))
+		{
+			continue;
+		}
 		FVector appleLocation = Apples[i]->GetActorLocation();
 		float distance = FVector::Dist(PlayerLocation, appleLocation);
 		if (distance < closestDistance)

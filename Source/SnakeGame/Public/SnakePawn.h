@@ -95,13 +95,15 @@ public:
 
 
 	UFUNCTION(BlueprintCallable)
-	ESnakeDirection AStarDirection(ASnakeWorld* InGrid);
+	void AStarDirection(ASnakeWorld* InGrid);
 
 	int GetDistance(UNode nodeA, UNode nodeB);
 
 	ESnakeDirection GetNextMoveDirection(UNode CurrentNode, UNode NextNode);
 
-	TArray<UNode*> RetracePath(UNode& startNode, UNode& endNode);
+	TArray<UNode*> RetracePath(UNode* startNode, UNode* endNode);
+
+	void QueueAStarPath(UNode* startNode, UNode* endNode);
 
 	UNode* currentSnakeNode = nullptr;
 };

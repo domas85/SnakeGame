@@ -232,31 +232,31 @@ void ASnakePawn::AteApple()
 	SnakePlayerState->AddApple();
 }
 
-ESnakeDirection ASnakePawn::AStarDirection(ASnakeWorld* InGrid)
+void ASnakePawn::AStarDirection(ASnakeWorld* InGrid)
 {
 	if (!IsValid(InGrid))
 	{
-		return ESnakeDirection::Up;
+		return;
 	}
 	FVector PlayerLocation = GetActorLocation();
 
-	UNode startNode = *InGrid->FindTileBasedOnLocation(PlayerLocation);
+	UNode* startNode = InGrid->FindTileBasedOnLocation(PlayerLocation);
 	UNode targetNode = *InGrid->FindClosestAppleNode(PlayerLocation);
 
-	if (currentSnakeNode != nullptr && currentSnakeNode->gridX == startNode.gridX && currentSnakeNode->gridY == startNode.gridY)
-	{
-		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("Already on the same node"));
-		return Direction;
-	}
+	//if (currentSnakeNode != nullptr && currentSnakeNode->gridX == startNode->gridX && currentSnakeNode->gridY == startNode->gridY)
+	//{
+	//	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("Already on the same node"));
+	//	return;
+	//}
 
-	if (currentSnakeNode == nullptr || currentSnakeNode->gridX != startNode.gridX && currentSnakeNode->gridY != startNode.gridY)
-	{
-		currentSnakeNode = &startNode;
-	}
+	//if (currentSnakeNode == nullptr || currentSnakeNode->gridX != startNode->gridX && currentSnakeNode->gridY != startNode->gridY)
+	//{
+	//	currentSnakeNode = startNode;
+	//}
 
 	TArray<UNode*> openSet = TArray<UNode*>();
 	TSet<UNode*> closedSet = TSet<UNode*>();
-	openSet.Add(&startNode);
+	openSet.Add(startNode);
 
 	while (openSet.Num() > 0)
 	{
@@ -272,21 +272,21 @@ ESnakeDirection ASnakePawn::AStarDirection(ASnakeWorld* InGrid)
 		closedSet.Add(currentNode);
 		if (*currentNode == targetNode)
 		{
-			TArray<UNode*> path = RetracePath(startNode, *currentNode);
+			//TArray<UNode*> path = RetracePath(startNode, currentNode);
+			QueueAStarPath(startNode, currentNode);
+			//if (path.Num() > 1)
+			//{
+			//	openSet.Empty();
+			//	closedSet.Empty();
 
-			if (path.Num() > 1)
-			{
-				openSet.Empty();
-				closedSet.Empty();
-				DirectionsQueue.Empty();
-				return GetNextMoveDirection(*path[path.Num() - 2], *path[path.Num() - 1]);
-				//return path[path.Num() - 2]->GetDirection();
-			}
-			else
-			{
-				GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("Path less then 1"));
-				return ESnakeDirection::Up;
-			}
+			//	
+			//	//return path[path.Num() - 2]->GetDirection();
+			//}
+			//else
+			//{
+			//	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("Path less then 1"));
+			//	return ESnakeDirection::Up;
+			//}
 		}
 
 		//TArray<UNode> neighbours = ;
@@ -301,7 +301,7 @@ ESnakeDirection ASnakePawn::AStarDirection(ASnakeWorld* InGrid)
 			{
 				neighbour->gCost = newCostToNeighbour;
 				neighbour->hCost = GetDistance(*neighbour, targetNode);
-				//neighbour->fCost = neighbour->gCost + neighbour->hCost;
+				neighbour->fCost = neighbour->gCost + neighbour->hCost;
 				neighbour->ParentNode = currentNode;
 				if (!openSet.Contains(neighbour))
 				{
@@ -310,42 +310,64 @@ ESnakeDirection ASnakePawn::AStarDirection(ASnakeWorld* InGrid)
 			}
 		}
 	}
-	return ESnakeDirection::Up;
+	GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("No path found"));
 }
 
-TArray<UNode*> ASnakePawn::RetracePath(UNode& startNode, UNode& endNode)
+TArray<UNode*> ASnakePawn::RetracePath(UNode* startNode, UNode* endNode)
 {
 	TArray<UNode*> path = TArray<UNode*>();
-	UNode current = endNode;
+	UNode* current = endNode;
 	while (current != startNode)
 	{
-		path.Add(&current);
-		current = *current.ParentNode;
+		path.Add(current);
+		DrawDebugLine(GetWorld(), current->Location + FVector(0.0f, 0.0f, 50.0f), current->ParentNode->Location + FVector(0.0f, 0.0f, 50.0f), FColor::Red, false, 30.0f, 0, 5.0f);
+		current = current->ParentNode;
 	}
+	Algo::Reverse(path);
+
 	return path;
+}
+
+void ASnakePawn::QueueAStarPath(UNode* startNode, UNode* endNode)
+{
+	DirectionsQueue.Empty();
+
+	TArray<UNode*> path = TArray<UNode*>();
+	UNode* current = endNode;
+	while (current != startNode)
+	{
+		path.Add(current);
+		//DirectionsQueue.Add(GetNextMoveDirection(*current->ParentNode, *current));
+		DrawDebugLine(GetWorld(), current->ParentNode->Location + FVector(-800.0f, 0.0f, 50.0f), current->Location + FVector(-800.0f, 0.0f, 50.0f), FColor::Red, false, 1.0f, 0, 5.0f);
+		current = current->ParentNode;
+	}
+	if (!path.IsEmpty())
+	{
+		DirectionsQueue.Add(GetNextMoveDirection(*current, *path[path.Num() - 1]));
+	}
 }
 
 ESnakeDirection ASnakePawn::GetNextMoveDirection(UNode CurrentNode, UNode NextNode)
 {
 	if (CurrentNode.gridX < NextNode.gridX)
 	{
-		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("Right"));
-		return ESnakeDirection::Right;
+		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("Up"));
+		return ESnakeDirection::Up;
 	}
 	else if (CurrentNode.gridX > NextNode.gridX)
-	{
-		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("Left"));
-		return ESnakeDirection::Left;
-	}
-	else if (CurrentNode.gridY < NextNode.gridY)
 	{
 		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("Down"));
 		return ESnakeDirection::Down;
 	}
+	else if (CurrentNode.gridY < NextNode.gridY)
+	{
+		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("Right"));
+		return ESnakeDirection::Right;
+	}
 	else
 	{
-		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("Up"));
-		return ESnakeDirection::Up;
+		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Red, TEXT("Left"));
+		return ESnakeDirection::Left;
 	}
 }
 
@@ -356,11 +378,11 @@ int ASnakePawn::GetDistance(UNode nodeA, UNode nodeB)
 
 	if (dstX > dstY)
 	{
-		return 14 * dstY + 10 * (dstX - dstY);
+		return 10 * dstY + 10 * (dstX - dstY);
 	}
 	else
 	{
-		return 14 * dstX + 10 * (dstY - dstX);
+		return 10 * dstX + 10 * (dstY - dstX);
 	}
 }
 
